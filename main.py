@@ -1,43 +1,13 @@
-import hashlib
-from os import urandom
-from string import ascii_uppercase, ascii_lowercase, digits
-from typing import List
+from fastapi import FastAPI, Depends, HTTPException
+from sqlalchemy.orm import Session
 
-from fastapi import FastAPI
-from pydantic import BaseModel
-
-from database import engine, Base
+import persistent.user as crud
+from database import engine, Base, SessionLocal
+from schema import UserCreate
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
-
-
-class User(BaseModel):
-    errors: List = []
-    name: str
-    password: str
-    hashed_password: bytes = None
-    salt: bytes = None
-    email: str
-
-    def is_valid(self):
-        if not any([x in self.password for x in ascii_uppercase]):
-            self.errors.append({"field": "A senha deve ter pelo menos uma letra maiuscula"})
-        if not any([x in self.password for x in ascii_lowercase]):
-            self.errors.append({"field": "A senha deve ter pelo menos uma letra minuscula"})
-        if not any([x in self.password for x in digits]):
-            self.errors.append({"field": "A senha deve ter pelo menos um número"})
-        if len(self.password) < 8:
-            self.errors.append({"field": "A senha deve ter pelo menos 8 caracteres"})
-
-        return len(self.errors) > 0
-
-    def hash_password(self):
-        salt = urandom(32)
-        key = hashlib.pbkdf2_hmac('sha256', self.password.encode('utf-8'), salt, 100_000)
-        self.hashed_password = key
-        self.salt = salt
 
 
 @app.get("/")
@@ -45,6 +15,19 @@ def read_root():
     return {"Hello": "World"}
 
 
+# Dependency
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
 @app.post("/sign-up")
-def create_user(user: User):
+def create_user(user: UserCreate, db: Session = Depends(get_db)):
     print(user)
+    db_user = crud.get_user_by_email(db, email=user.email)
+    if db_user:
+        raise HTTPException(status_code=400, detail="email já registrado")
+    return crud.create_user(db=db, user=user)
