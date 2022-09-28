@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 import app.persistent.user as crud
@@ -6,8 +7,14 @@ from app.database import engine, Base, SessionLocal
 from app.schema import UserCreate
 
 Base.metadata.create_all(bind=engine)
+allow_all = ['*']
 
 app = FastAPI()
+app.add_middleware(CORSMiddleware,
+                   allow_origins=allow_all,
+                   allow_credentials=True,
+                   allow_methods=allow_all,
+                   allow_headers=allow_all)
 
 
 @app.get("/")
