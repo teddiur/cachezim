@@ -1,8 +1,7 @@
 import bcrypt
 from sqlalchemy.orm import Session
 
-import model
-import schema
+from app import schema, model
 
 
 def get_user(db: Session, user_id: int):

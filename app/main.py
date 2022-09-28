@@ -1,9 +1,9 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-import persistent.user as crud
-from database import engine, Base, SessionLocal
-from schema import UserCreate
+import app.persistent.user as crud
+from app.database import engine, Base, SessionLocal
+from app.schema import UserCreate
 
 Base.metadata.create_all(bind=engine)
 
