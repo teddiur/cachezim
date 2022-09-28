@@ -17,10 +17,17 @@ def get_users(db: Session, skip: int = 0, limit: int = 100):
 
 
 def create_user(db: Session, user: schema.UserCreate):
-    salt = bcrypt.gensalt()
-    hashed_password = bcrypt.hashpw(user.password.encode('utf-8'), salt)
-    db_user = model.User(name=user.name, email=user.email, created_at=user.created_at, hashed_password=hashed_password)
+    hashed_password = hash_password(user.password)
+    db_user = model.User(name=user.name,
+                         email=user.email,
+                         created_at=user.created_at,
+                         hashed_password=hashed_password.decode('utf-8'))
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
     return db_user
+
+
+def hash_password(password: str) -> bytes:
+    salt = bcrypt.gensalt()
+    return bcrypt.hashpw(password.encode('utf-8'), salt)
