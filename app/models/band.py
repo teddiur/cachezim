@@ -1,8 +1,8 @@
 from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.orm import relationship
 
-from src.database import Base
-from src.models import user_band
+from app.database import Base
+from app.models import user_band
 
 
 class Band(Base):

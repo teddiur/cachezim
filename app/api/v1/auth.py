@@ -1,24 +1,20 @@
 from datetime import datetime, timedelta
 
 import jwt
-from decouple import config
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
-from src import persistent as crud
-from src.database import get_db
-from src.schemas import UserCreate
+from app import crud as crud
+from app.core.config import settings
+from app.database import get_db
+from app.schemas import UserCreate
 
-router = APIRouter(
-    tags=["Auth"],
-    responses={404: {"description": "Not found"}},
-)
+router = APIRouter()
 
 
 @router.post("/sign-up")
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
-    print(user)
     db_user = crud.get_user_by_email(db, email=user.email)
     if db_user:
         raise HTTPException(status_code=400, detail="Email já registrado")
@@ -38,6 +34,6 @@ def authenticate(form_data: OAuth2PasswordRequestForm = Depends(), db: Session =
     return {"access_token": jwt.encode({"user_id": user.user_id,
                                         "email": user.email,
                                         "exp": datetime.utcnow() + timedelta(days=30)},
-                                       key=config('SIGN_IN_KEY'),
+                                       key=settings.SIGN_IN_KEY,
                                        algorithm="HS256"),
             "token_type": "bearer"}

@@ -12,6 +12,5 @@ RUN pip install --upgrade pip && pip install --no-cache-dir --upgrade -r /code/r
 
 COPY ./app /code/app
 COPY .env /code/.env
-COPY main.py /code/main.py
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]
