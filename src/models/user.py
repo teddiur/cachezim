@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, DateTime, Table, ForeignKey
 from sqlalchemy.orm import relationship
 
-from app.database import Base
+from src.database import Base
 
 user_band = Table('user_band',
                   Base.metadata,

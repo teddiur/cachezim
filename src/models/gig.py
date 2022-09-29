@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, ForeignKey, DateTime, Numeric, Boolean
 
-from app.database import Base
+from src.database import Base
 
 
 class Gig(Base):

@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime
 
-from app.database import Base
+from src.database import Base
 
 
 class Address(Base):
